@@ -1,0 +1,15 @@
+{
+  "name": "wms-image-custom-proj",
+  "dependencies": {
+    "core-js": "^3.6.4",
+    "ol": "6.2.1",
+    "proj4": "2.6.0"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.4"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build --experimental-scope-hoisting --public-url . index.html"
+  }
+}

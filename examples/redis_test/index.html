@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Redis</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        const socket = io();
+        socket.on('connect', () => {
+            console.log('connection made');
+            socket.emit('new client');
+        });
+
+        function sendUpdate(){
+            console.log('update sent');
+            socket.emit('update');
+        }
+
+        socket.on('update', () => {
+            console.log('update received');
+        });
+    </script>
+  </head>
+  <body>
+    <form>
+      <input type="button" value="send update" onclick="sendUpdate()">
+    </form>
+  </body>
+</html>
