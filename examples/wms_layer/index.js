@@ -21,8 +21,8 @@ var projection = new Projection({
 var extent = [1267889.3582406002, 470153.1037401045, 1583173.6058199904, 660041.6989159819]
 
 var wmsSource = new TileWMS({
-  url: 'http://localhost:8080/geoserver/test/wms',
-  params: {'LAYERS': 'test:sv_cce_insptrade_pts', 'TILED': true},
+  url: 'http://10.5.114.216:32728/geoserver/city0/wms',
+  params: {'LAYERS': 'city0:zipcodes', 'TILED': true},
   serverType: 'geoserver'
 });
 

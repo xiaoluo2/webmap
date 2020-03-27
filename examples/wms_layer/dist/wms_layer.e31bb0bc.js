@@ -61463,18 +61463,6 @@ var _proj3 = _interopRequireDefault(require("proj4"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Transparent Proj4js support:
-//
-// EPSG:21781 is known to Proj4js because its definition is registered by
-// calling proj4.defs(). Now when we create an ol/proj/Projection instance with
-// the 'EPSG:21781' code, OpenLayers will pick up the transform functions from
-// Proj4js. To get the registered ol/proj/Projection instance with other
-// parameters like units and axis orientation applied from Proj4js, use
-// `ol/proj#get('EPSG:21781')`.
-//
-// Note that we are setting the projection's extent here, which is used to
-// determine the view resolution for zoom level 0. Recommended values for a
-// projection's validity extent can be found at https://epsg.io/.
 _proj3.default.defs('EPSG:2248', '+proj=lcc +lat_1=39.45 +lat_2=38.3 +lat_0=37.66666666666666 +lon_0=-77 +x_0=399999.9998983998 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs');
 
 (0, _proj2.register)(_proj3.default);
@@ -61484,9 +61472,9 @@ var projection = new _Projection.default({
 });
 var extent = [1267889.3582406002, 470153.1037401045, 1583173.6058199904, 660041.6989159819];
 var wmsSource = new _TileWMS.default({
-  url: 'http://localhost:8080/geoserver/test/wms',
+  url: 'http://10.5.114.216:32728/geoserver/city0/wms',
   params: {
-    'LAYERS': 'test:sv_cce_insptrade_pts',
+    'LAYERS': 'city0:zipcodes',
     'TILED': true
   },
   serverType: 'geoserver'
@@ -61534,7 +61522,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50726" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53112" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
