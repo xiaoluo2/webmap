@@ -8,6 +8,10 @@ import OSM from 'ol/source/OSM';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
+import TileLayer from 'ol/layer/Tile';
+import ImageLayer from 'ol/layer/Image';
+import VectorLayer from 'ol/layer/Vector';
+
 // Third party
 import Popup from 'ol-popup';
 import ContextMenu from 'ol-contextmenu';
@@ -19,12 +23,16 @@ import Projection from 'ol/proj/Projection';
 import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 
-import TileLayer from 'ol/layer/Tile';
-import ImageLayer from 'ol/layer/Image';
-import VectorLayer from 'ol/layer/Vector';
+import {
+  wmsSource,
+  vectorSource,
+  addPoint,
+  deletePoint,
+  getPopupData
+} from './server-request';
 
-import {wmsSource, vectorSource, transactWFS} from './server-request';
 import highlightStyle from './highlight';
+
 
 // Projection Definition
 proj4.defs('EPSG:2248',
@@ -45,7 +53,6 @@ var view = new View({
   zoom: 4.5,
   maxZoom: 13
 });
-var resolution = view.getResolution();
 
 var baseMap = new TileLayer({ source: new OSM() });
 var parcels = new ImageLayer({ source: wmsSource });
@@ -61,72 +68,7 @@ var map = new Map({
   view: view
 });
 
-// Menu TODO: Move to module
-class MenuControl{
-
-  constructor() {
-      this.lastAction = null;
-      this.selected = new Set();
-  }
-
-  static get Actions() { 
-      Object.freeze({
-          CREATE: 'create',
-          DELETE: 'delete',
-          MOVE: 'move',
-          EDIT: 'edit'
-      });
-  }
-
-  // deleteSelection() {
-  //     selection.forEach((f) => {
-  //         featureLayer.removeFeature(f);
-  //     });
-  //     update();
-  //     refresh_sources();
-  // }
-
-  // listSelection() {
-  //     var content = '';
-  //     this.selection.forEach((f) => {
-  //         console.log(f);
-  //     });
-  //     const html = content;
-  // }
-
-  addPoint(obj) {
-    vectorSource.addFeature(obj.data.point);
-    transactWFS('insert', obj.data.point);
-  }
-
-  deletePoint(obj) {
-    vectorSource.removeFeature(obj.data.point);
-    transactWFS('delete', obj.data.point);
-  }
-
-  // movePoint() {
-  // }
-
-  // editPoint() {
-  //     // modal window
-  // }
-
-  // undo(){
-  //     switch(this.lastAction) {
-  //         case 'create':
-  //             break;
-  //         case 'delete':
-  //             break;
-  //         case 'move':
-  //             break;
-  //         case 'edit':
-  //             break;
-  //     }
-  // }
-
-}
-
-var menucontrol = new MenuControl();
+// Menu
 var contextmenu = new ContextMenu({
   width: 170,
   defaultItems: true, // defaultItems are (for now) Zoom In/Zoom Out
@@ -145,7 +87,7 @@ contextmenu.on('open', function (evt) {
       delete_items.push({
         text: 'Delete ' + properties.userid + ': ' + properties.csa_id,
         data: {point: f},
-        callback: menucontrol.deletePoint
+        callback: deletePoint
       });
     });
     contextmenu.extend(delete_items);
@@ -156,7 +98,7 @@ contextmenu.on('open', function (evt) {
     var add_item = [{
       text: 'Add Point',
       data: {point: new_point},
-      callback: menucontrol.addPoint
+      callback: addPoint
     }];
     contextmenu.clear();
     contextmenu.extend(add_item);
@@ -169,51 +111,6 @@ var popup = new Popup({
   element: document.getElementById('popup')
 });
 map.addOverlay(popup);
-
-function showPopup(coordinate) {
-  // get wms url
-  var viewResolution = /** @type {number} */ (resolution);
-  var url = wmsSource.getFeatureInfoUrl(
-    coordinate, viewResolution, 'EPSG:2248',
-    { 'INFO_FORMAT': 'application/json' });
-
-  // request wms service
-  if (url) {
-    fetch(url)
-      .then(function (response) { return response.text(); })
-      .then(function (json) {
-        var obj = JSON.parse(json);
-        var items = [];
-        // show popup if there is a feature
-        if (obj.features.length > 0) {
-          // create table
-          var p = obj.features[0].properties;
-          for (var key in p) {
-            if (p.hasOwnProperty(key) && key != 'bbox') {
-              items.push(
-                `<tr>
-                  <th scope="row">${key}</th>
-                  <td>${p[key]}</td>
-                  <tr>`
-              );
-            }
-          }
-          const html = `
-            <html>
-            <body>
-            <table>
-            ` + items.join('') + `
-            </table>
-            </body>
-            </html>
-            `
-          popup.show(coordinate, html);
-        } else { // otherwise hide popup
-          popup.hide();
-        }
-      });
-  }
-}
 
 // function selectFeature(evt) {
 //   //TODO show list of selected properties
@@ -236,6 +133,46 @@ function showPopup(coordinate) {
 //     selected = new Set();
 //   }
 // }
+
+function showPopup(coordinate) {
+  var resolution = /** @type {number} */ (view.getResolution());
+  var promise = getPopupData(coordinate, resolution);
+  promise.then(function(obj){
+    // show popup if there is a feature
+    if (obj.features.length > 0) {
+      const html = createTable(obj);
+      popup.show(coordinate, html);
+    } else { // otherwise hide popup
+      popup.hide();
+    }
+  });
+}
+
+function createTable(obj){
+  // create table
+  var items = [];
+  var p = obj.features[0].properties;
+  for (var key in p) {
+    if (p.hasOwnProperty(key) && key != 'bbox') {
+      items.push(
+        `<tr>
+          <th scope="row">${key}</th>
+          <td>${p[key]}</td>
+          <tr>`
+      );
+    }
+  }
+  const html = `
+    <html>
+    <body>
+    <table>
+    ` + items.join('') + `
+    </table>
+    </body>
+    </html>
+    `
+  return html;
+}
 
 function clickhandler(evt) {
   showPopup(evt.coordinate);

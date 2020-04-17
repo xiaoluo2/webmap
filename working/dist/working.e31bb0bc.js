@@ -52570,7 +52570,1267 @@ function (_super) {
 
 var _default = OSM;
 exports.default = _default;
-},{"./XYZ.js":"node_modules/ol/source/XYZ.js"}],"node_modules/ol-popup/dist/ol-popup.js":[function(require,module,exports) {
+},{"./XYZ.js":"node_modules/ol/source/XYZ.js"}],"node_modules/ol/layer/TileProperty.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/**
+ * @module ol/layer/TileProperty
+ */
+
+/**
+ * @enum {string}
+ */
+var _default = {
+  PRELOAD: 'preload',
+  USE_INTERIM_TILES_ON_ERROR: 'useInterimTilesOnError'
+};
+exports.default = _default;
+},{}],"node_modules/ol/layer/BaseTile.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Layer = _interopRequireDefault(require("./Layer.js"));
+
+var _TileProperty = _interopRequireDefault(require("./TileProperty.js"));
+
+var _obj = require("../obj.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/layer/BaseTile
+ */
+
+
+/**
+ * @typedef {Object} Options
+ * @property {string} [className='ol-layer'] A CSS class name to set to the layer element.
+ * @property {number} [opacity=1] Opacity (0, 1).
+ * @property {boolean} [visible=true] Visibility.
+ * @property {import("../extent.js").Extent} [extent] The bounding extent for layer rendering.  The layer will not be
+ * rendered outside of this extent.
+ * @property {number} [zIndex] The z-index for layer rendering.  At rendering time, the layers
+ * will be ordered, first by Z-index and then by position. When `undefined`, a `zIndex` of 0 is assumed
+ * for layers that are added to the map's `layers` collection, or `Infinity` when the layer's `setMap()`
+ * method was used.
+ * @property {number} [minResolution] The minimum resolution (inclusive) at which this layer will be
+ * visible.
+ * @property {number} [maxResolution] The maximum resolution (exclusive) below which this layer will
+ * be visible.
+ * @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
+ * visible.
+ * @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
+ * be visible.
+ * @property {number} [preload=0] Preload. Load low-resolution tiles up to `preload` levels. `0`
+ * means no preloading.
+ * @property {import("../source/Tile.js").default} [source] Source for this layer.
+ * @property {import("../PluggableMap.js").default} [map] Sets the layer as overlay on a map. The map will not manage
+ * this layer in its layers collection, and the layer will be rendered on top. This is useful for
+ * temporary layers. The standard way to add a layer to a map and have it managed by the map is to
+ * use {@link module:ol/Map#addLayer}.
+ * @property {boolean} [useInterimTilesOnError=true] Use interim tiles on error.
+ */
+
+/**
+ * @classdesc
+ * For layer sources that provide pre-rendered, tiled images in grids that are
+ * organized by zoom levels for specific resolutions.
+ * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
+ * property on the layer object; for example, setting `title: 'My Title'` in the
+ * options means that `title` is observable, and has get/set accessors.
+ *
+ * @extends {Layer<import("../source/Tile.js").default>}
+ * @api
+ */
+var BaseTileLayer =
+/** @class */
+function (_super) {
+  __extends(BaseTileLayer, _super);
+  /**
+   * @param {Options=} opt_options Tile layer options.
+   */
+
+
+  function BaseTileLayer(opt_options) {
+    var _this = this;
+
+    var options = opt_options ? opt_options : {};
+    var baseOptions = (0, _obj.assign)({}, options);
+    delete baseOptions.preload;
+    delete baseOptions.useInterimTilesOnError;
+    _this = _super.call(this, baseOptions) || this;
+
+    _this.setPreload(options.preload !== undefined ? options.preload : 0);
+
+    _this.setUseInterimTilesOnError(options.useInterimTilesOnError !== undefined ? options.useInterimTilesOnError : true);
+
+    return _this;
+  }
+  /**
+  * Return the level as number to which we will preload tiles up to.
+  * @return {number} The level to preload tiles up to.
+  * @observable
+  * @api
+  */
+
+
+  BaseTileLayer.prototype.getPreload = function () {
+    return (
+      /** @type {number} */
+      this.get(_TileProperty.default.PRELOAD)
+    );
+  };
+  /**
+  * Set the level as number to which we will preload tiles up to.
+  * @param {number} preload The level to preload tiles up to.
+  * @observable
+  * @api
+  */
+
+
+  BaseTileLayer.prototype.setPreload = function (preload) {
+    this.set(_TileProperty.default.PRELOAD, preload);
+  };
+  /**
+  * Whether we use interim tiles on error.
+  * @return {boolean} Use interim tiles on error.
+  * @observable
+  * @api
+  */
+
+
+  BaseTileLayer.prototype.getUseInterimTilesOnError = function () {
+    return (
+      /** @type {boolean} */
+      this.get(_TileProperty.default.USE_INTERIM_TILES_ON_ERROR)
+    );
+  };
+  /**
+  * Set whether we use interim tiles on error.
+  * @param {boolean} useInterimTilesOnError Use interim tiles on error.
+  * @observable
+  * @api
+  */
+
+
+  BaseTileLayer.prototype.setUseInterimTilesOnError = function (useInterimTilesOnError) {
+    this.set(_TileProperty.default.USE_INTERIM_TILES_ON_ERROR, useInterimTilesOnError);
+  };
+
+  return BaseTileLayer;
+}(_Layer.default);
+
+var _default = BaseTileLayer;
+exports.default = _default;
+},{"./Layer.js":"node_modules/ol/layer/Layer.js","./TileProperty.js":"node_modules/ol/layer/TileProperty.js","../obj.js":"node_modules/ol/obj.js"}],"node_modules/ol/renderer/canvas/TileLayer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _util = require("../../util.js");
+
+var _proj = require("../../proj.js");
+
+var _TileRange = _interopRequireDefault(require("../../TileRange.js"));
+
+var _TileState = _interopRequireDefault(require("../../TileState.js"));
+
+var _extent = require("../../extent.js");
+
+var _Layer = _interopRequireDefault(require("./Layer.js"));
+
+var _transform = require("../../transform.js");
+
+var _array = require("../../array.js");
+
+var _canvas = require("../../render/canvas.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/renderer/canvas/TileLayer
+ */
+
+
+/**
+ * @classdesc
+ * Canvas renderer for tile layers.
+ * @api
+ */
+var CanvasTileLayerRenderer =
+/** @class */
+function (_super) {
+  __extends(CanvasTileLayerRenderer, _super);
+  /**
+   * @param {import("../../layer/Tile.js").default|import("../../layer/VectorTile.js").default} tileLayer Tile layer.
+   */
+
+
+  function CanvasTileLayerRenderer(tileLayer) {
+    var _this = _super.call(this, tileLayer) || this;
+    /**
+     * Rendered extent has changed since the previous `renderFrame()` call
+     * @type {boolean}
+     */
+
+
+    _this.extentChanged = true;
+    /**
+     * @private
+     * @type {?import("../../extent.js").Extent}
+     */
+
+    _this.renderedExtent_ = null;
+    /**
+     * @protected
+     * @type {number}
+     */
+
+    _this.renderedPixelRatio;
+    /**
+     * @protected
+     * @type {import("../../proj/Projection.js").default}
+     */
+
+    _this.renderedProjection = null;
+    /**
+     * @protected
+     * @type {number}
+     */
+
+    _this.renderedRevision;
+    /**
+     * @protected
+     * @type {!Array<import("../../Tile.js").default>}
+     */
+
+    _this.renderedTiles = [];
+    /**
+     * @private
+     * @type {boolean}
+     */
+
+    _this.newTiles_ = false;
+    /**
+     * @protected
+     * @type {import("../../extent.js").Extent}
+     */
+
+    _this.tmpExtent = (0, _extent.createEmpty)();
+    /**
+     * @private
+     * @type {import("../../TileRange.js").default}
+     */
+
+    _this.tmpTileRange_ = new _TileRange.default(0, 0, 0, 0);
+    return _this;
+  }
+  /**
+   * @protected
+   * @param {import("../../Tile.js").default} tile Tile.
+   * @return {boolean} Tile is drawable.
+   */
+
+
+  CanvasTileLayerRenderer.prototype.isDrawableTile = function (tile) {
+    var tileLayer = this.getLayer();
+    var tileState = tile.getState();
+    var useInterimTilesOnError = tileLayer.getUseInterimTilesOnError();
+    return tileState == _TileState.default.LOADED || tileState == _TileState.default.EMPTY || tileState == _TileState.default.ERROR && !useInterimTilesOnError;
+  };
+  /**
+   * @param {number} z Tile coordinate z.
+   * @param {number} x Tile coordinate x.
+   * @param {number} y Tile coordinate y.
+   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
+   * @return {!import("../../Tile.js").default} Tile.
+   */
+
+
+  CanvasTileLayerRenderer.prototype.getTile = function (z, x, y, frameState) {
+    var pixelRatio = frameState.pixelRatio;
+    var projection = frameState.viewState.projection;
+    var tileLayer = this.getLayer();
+    var tileSource = tileLayer.getSource();
+    var tile = tileSource.getTile(z, x, y, pixelRatio, projection);
+
+    if (tile.getState() == _TileState.default.ERROR) {
+      if (!tileLayer.getUseInterimTilesOnError()) {
+        // When useInterimTilesOnError is false, we consider the error tile as loaded.
+        tile.setState(_TileState.default.LOADED);
+      } else if (tileLayer.getPreload() > 0) {
+        // Preloaded tiles for lower resolutions might have finished loading.
+        this.newTiles_ = true;
+      }
+    }
+
+    if (!this.isDrawableTile(tile)) {
+      tile = tile.getInterimTile();
+    }
+
+    return tile;
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasTileLayerRenderer.prototype.loadedTileCallback = function (tiles, zoom, tile) {
+    if (this.isDrawableTile(tile)) {
+      return _super.prototype.loadedTileCallback.call(this, tiles, zoom, tile);
+    }
+
+    return false;
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasTileLayerRenderer.prototype.prepareFrame = function (frameState) {
+    return !!this.getLayer().getSource();
+  };
+  /**
+   * TODO: File a TypeScript issue about inheritDoc not being followed
+   * all the way.  Without this explicit return type, the VectorTileLayer
+   * renderFrame function does not pass.
+   *
+   * @inheritDoc
+   * @returns {HTMLElement} The rendered element.
+   */
+
+
+  CanvasTileLayerRenderer.prototype.renderFrame = function (frameState, target) {
+    var layerState = frameState.layerStatesArray[frameState.layerIndex];
+    var viewState = frameState.viewState;
+    var projection = viewState.projection;
+    var viewResolution = viewState.resolution;
+    var viewCenter = viewState.center;
+    var rotation = viewState.rotation;
+    var pixelRatio = frameState.pixelRatio;
+    var tileLayer = this.getLayer();
+    var tileSource = tileLayer.getSource();
+    var sourceRevision = tileSource.getRevision();
+    var tileGrid = tileSource.getTileGridForProjection(projection);
+    var z = tileGrid.getZForResolution(viewResolution, tileSource.zDirection);
+    var tileResolution = tileGrid.getResolution(z);
+    var extent = frameState.extent;
+    var layerExtent = layerState.extent && (0, _proj.fromUserExtent)(layerState.extent, projection);
+
+    if (layerExtent) {
+      extent = (0, _extent.getIntersection)(extent, (0, _proj.fromUserExtent)(layerState.extent, projection));
+    }
+
+    var tilePixelRatio = tileSource.getTilePixelRatio(pixelRatio); // desired dimensions of the canvas in pixels
+
+    var width = Math.round(frameState.size[0] * tilePixelRatio);
+    var height = Math.round(frameState.size[1] * tilePixelRatio);
+
+    if (rotation) {
+      var size = Math.round(Math.sqrt(width * width + height * height));
+      width = size;
+      height = size;
+    }
+
+    var dx = tileResolution * width / 2 / tilePixelRatio;
+    var dy = tileResolution * height / 2 / tilePixelRatio;
+    var canvasExtent = [viewCenter[0] - dx, viewCenter[1] - dy, viewCenter[0] + dx, viewCenter[1] + dy];
+    var tileRange = tileGrid.getTileRangeForExtentAndZ(extent, z);
+    /**
+     * @type {Object<number, Object<string, import("../../Tile.js").default>>}
+     */
+
+    var tilesToDrawByZ = {};
+    tilesToDrawByZ[z] = {};
+    var findLoadedTiles = this.createLoadedTileFinder(tileSource, projection, tilesToDrawByZ);
+    var tmpExtent = this.tmpExtent;
+    var tmpTileRange = this.tmpTileRange_;
+    this.newTiles_ = false;
+
+    for (var x = tileRange.minX; x <= tileRange.maxX; ++x) {
+      for (var y = tileRange.minY; y <= tileRange.maxY; ++y) {
+        var tile = this.getTile(z, x, y, frameState);
+
+        if (this.isDrawableTile(tile)) {
+          var uid = (0, _util.getUid)(this);
+
+          if (tile.getState() == _TileState.default.LOADED) {
+            tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
+            var inTransition = tile.inTransition(uid);
+
+            if (!this.newTiles_ && (inTransition || this.renderedTiles.indexOf(tile) === -1)) {
+              this.newTiles_ = true;
+            }
+          }
+
+          if (tile.getAlpha(uid, frameState.time) === 1) {
+            // don't look for alt tiles if alpha is 1
+            continue;
+          }
+        }
+
+        var childTileRange = tileGrid.getTileCoordChildTileRange(tile.tileCoord, tmpTileRange, tmpExtent);
+        var covered = false;
+
+        if (childTileRange) {
+          covered = findLoadedTiles(z + 1, childTileRange);
+        }
+
+        if (!covered) {
+          tileGrid.forEachTileCoordParentTileRange(tile.tileCoord, findLoadedTiles, tmpTileRange, tmpExtent);
+        }
+      }
+    }
+
+    var canvasScale = tileResolution / viewResolution; // set forward and inverse pixel transforms
+
+    (0, _transform.compose)(this.pixelTransform, frameState.size[0] / 2, frameState.size[1] / 2, 1 / tilePixelRatio, 1 / tilePixelRatio, rotation, -width / 2, -height / 2);
+    var canvasTransform = (0, _canvas.createTransformString)(this.pixelTransform);
+    this.useContainer(target, canvasTransform, layerState.opacity);
+    var context = this.context;
+    var canvas = context.canvas;
+    (0, _transform.makeInverse)(this.inversePixelTransform, this.pixelTransform); // set scale transform for calculating tile positions on the canvas
+
+    (0, _transform.compose)(this.tempTransform_, width / 2, height / 2, canvasScale, canvasScale, 0, -width / 2, -height / 2);
+
+    if (canvas.width != width || canvas.height != height) {
+      canvas.width = width;
+      canvas.height = height;
+    } else if (!this.containerReused) {
+      context.clearRect(0, 0, width, height);
+    }
+
+    if (layerExtent) {
+      this.clipUnrotated(context, frameState, layerExtent);
+    }
+
+    this.preRender(context, frameState);
+    this.renderedTiles.length = 0;
+    /** @type {Array<number>} */
+
+    var zs = Object.keys(tilesToDrawByZ).map(Number);
+    zs.sort(_array.numberSafeCompareFunction);
+    var clips, clipZs, currentClip;
+
+    if (layerState.opacity === 1 && (!this.containerReused || tileSource.getOpaque(frameState.viewState.projection))) {
+      zs = zs.reverse();
+    } else {
+      clips = [];
+      clipZs = [];
+    }
+
+    for (var i = zs.length - 1; i >= 0; --i) {
+      var currentZ = zs[i];
+      var currentTilePixelSize = tileSource.getTilePixelSize(currentZ, pixelRatio, projection);
+      var currentResolution = tileGrid.getResolution(currentZ);
+      var currentScale = currentResolution / tileResolution;
+      var dx_1 = currentTilePixelSize[0] * currentScale * canvasScale;
+      var dy_1 = currentTilePixelSize[1] * currentScale * canvasScale;
+      var originTileCoord = tileGrid.getTileCoordForCoordAndZ((0, _extent.getTopLeft)(canvasExtent), currentZ);
+      var originTileExtent = tileGrid.getTileCoordExtent(originTileCoord);
+      var origin_1 = (0, _transform.apply)(this.tempTransform_, [tilePixelRatio * (originTileExtent[0] - canvasExtent[0]) / tileResolution, tilePixelRatio * (canvasExtent[3] - originTileExtent[3]) / tileResolution]);
+      var tileGutter = tilePixelRatio * tileSource.getGutterForProjection(projection);
+      var tilesToDraw = tilesToDrawByZ[currentZ];
+
+      for (var tileCoordKey in tilesToDraw) {
+        var tile =
+        /** @type {import("../../ImageTile.js").default} */
+        tilesToDraw[tileCoordKey];
+        var tileCoord = tile.tileCoord; // Calculate integer positions and sizes so that tiles align
+
+        var floatX = origin_1[0] - (originTileCoord[1] - tileCoord[1]) * dx_1;
+        var nextX = Math.round(floatX + dx_1);
+        var floatY = origin_1[1] - (originTileCoord[2] - tileCoord[2]) * dy_1;
+        var nextY = Math.round(floatY + dy_1);
+        var x = Math.round(floatX);
+        var y = Math.round(floatY);
+        var w = nextX - x;
+        var h = nextY - y;
+        var transition = z === currentZ;
+        var inTransition = transition && tile.getAlpha((0, _util.getUid)(this), frameState.time) !== 1;
+
+        if (!inTransition) {
+          if (clips) {
+            // Clip mask for regions in this tile that already filled by a higher z tile
+            context.save();
+            currentClip = [x, y, x + w, y, x + w, y + h, x, y + h];
+
+            for (var i_1 = 0, ii = clips.length; i_1 < ii; ++i_1) {
+              if (z !== currentZ && currentZ < clipZs[i_1]) {
+                var clip = clips[i_1];
+                context.beginPath(); // counter-clockwise (outer ring) for current tile
+
+                context.moveTo(currentClip[0], currentClip[1]);
+                context.lineTo(currentClip[2], currentClip[3]);
+                context.lineTo(currentClip[4], currentClip[5]);
+                context.lineTo(currentClip[6], currentClip[7]); // clockwise (inner ring) for higher z tile
+
+                context.moveTo(clip[6], clip[7]);
+                context.lineTo(clip[4], clip[5]);
+                context.lineTo(clip[2], clip[3]);
+                context.lineTo(clip[0], clip[1]);
+                context.clip();
+              }
+            }
+
+            clips.push(currentClip);
+            clipZs.push(currentZ);
+          } else {
+            context.clearRect(x, y, w, h);
+          }
+        }
+
+        this.drawTileImage(tile, frameState, x, y, w, h, tileGutter, transition, layerState.opacity);
+
+        if (clips && !inTransition) {
+          context.restore();
+        }
+
+        this.renderedTiles.push(tile);
+        this.updateUsedTiles(frameState.usedTiles, tileSource, tile);
+      }
+    }
+
+    this.renderedRevision = sourceRevision;
+    this.renderedResolution = tileResolution;
+    this.extentChanged = !this.renderedExtent_ || !(0, _extent.equals)(this.renderedExtent_, canvasExtent);
+    this.renderedExtent_ = canvasExtent;
+    this.renderedPixelRatio = pixelRatio;
+    this.renderedProjection = projection;
+    this.manageTilePyramid(frameState, tileSource, tileGrid, pixelRatio, projection, extent, z, tileLayer.getPreload());
+    this.scheduleExpireCache(frameState, tileSource);
+    this.postRender(context, frameState);
+
+    if (layerState.extent) {
+      context.restore();
+    }
+
+    if (canvasTransform !== canvas.style.transform) {
+      canvas.style.transform = canvasTransform;
+    }
+
+    return this.container;
+  };
+  /**
+   * @param {import("../../ImageTile.js").default} tile Tile.
+   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
+   * @param {number} x Left of the tile.
+   * @param {number} y Top of the tile.
+   * @param {number} w Width of the tile.
+   * @param {number} h Height of the tile.
+   * @param {number} gutter Tile gutter.
+   * @param {boolean} transition Apply an alpha transition.
+   * @param {number} opacity Opacity.
+   */
+
+
+  CanvasTileLayerRenderer.prototype.drawTileImage = function (tile, frameState, x, y, w, h, gutter, transition, opacity) {
+    var image = this.getTileImage(tile);
+
+    if (!image) {
+      return;
+    }
+
+    var uid = (0, _util.getUid)(this);
+    var tileAlpha = transition ? tile.getAlpha(uid, frameState.time) : 1;
+    var alpha = opacity * tileAlpha;
+    var alphaChanged = alpha !== this.context.globalAlpha;
+
+    if (alphaChanged) {
+      this.context.save();
+      this.context.globalAlpha = alpha;
+    }
+
+    this.context.drawImage(image, gutter, gutter, image.width - 2 * gutter, image.height - 2 * gutter, x, y, w, h);
+
+    if (alphaChanged) {
+      this.context.restore();
+    }
+
+    if (tileAlpha !== 1) {
+      frameState.animate = true;
+    } else if (transition) {
+      tile.endTransition(uid);
+    }
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasTileLayerRenderer.prototype.getImage = function () {
+    var context = this.context;
+    return context ? context.canvas : null;
+  };
+  /**
+   * Get the image from a tile.
+   * @param {import("../../ImageTile.js").default} tile Tile.
+   * @return {HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} Image.
+   * @protected
+   */
+
+
+  CanvasTileLayerRenderer.prototype.getTileImage = function (tile) {
+    return tile.getImage();
+  };
+  /**
+   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
+   * @param {import("../../source/Tile.js").default} tileSource Tile source.
+   * @protected
+   */
+
+
+  CanvasTileLayerRenderer.prototype.scheduleExpireCache = function (frameState, tileSource) {
+    if (tileSource.canExpireCache()) {
+      /**
+       * @param {import("../../source/Tile.js").default} tileSource Tile source.
+       * @param {import("../../PluggableMap.js").default} map Map.
+       * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
+       */
+      var postRenderFunction = function (tileSource, map, frameState) {
+        var tileSourceKey = (0, _util.getUid)(tileSource);
+
+        if (tileSourceKey in frameState.usedTiles) {
+          tileSource.expireCache(frameState.viewState.projection, frameState.usedTiles[tileSourceKey]);
+        }
+      }.bind(null, tileSource);
+
+      frameState.postRenderFunctions.push(
+      /** @type {import("../../PluggableMap.js").PostRenderFunction} */
+      postRenderFunction);
+    }
+  };
+  /**
+   * @param {!Object<string, !Object<string, boolean>>} usedTiles Used tiles.
+   * @param {import("../../source/Tile.js").default} tileSource Tile source.
+   * @param {import('../../Tile.js').default} tile Tile.
+   * @protected
+   */
+
+
+  CanvasTileLayerRenderer.prototype.updateUsedTiles = function (usedTiles, tileSource, tile) {
+    // FIXME should we use tilesToDrawByZ instead?
+    var tileSourceKey = (0, _util.getUid)(tileSource);
+
+    if (!(tileSourceKey in usedTiles)) {
+      usedTiles[tileSourceKey] = {};
+    }
+
+    usedTiles[tileSourceKey][tile.getKey()] = true;
+  };
+  /**
+   * Manage tile pyramid.
+   * This function performs a number of functions related to the tiles at the
+   * current zoom and lower zoom levels:
+   * - registers idle tiles in frameState.wantedTiles so that they are not
+   *   discarded by the tile queue
+   * - enqueues missing tiles
+   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
+   * @param {import("../../source/Tile.js").default} tileSource Tile source.
+   * @param {import("../../tilegrid/TileGrid.js").default} tileGrid Tile grid.
+   * @param {number} pixelRatio Pixel ratio.
+   * @param {import("../../proj/Projection.js").default} projection Projection.
+   * @param {import("../../extent.js").Extent} extent Extent.
+   * @param {number} currentZ Current Z.
+   * @param {number} preload Load low resolution tiles up to 'preload' levels.
+   * @param {function(import("../../Tile.js").default)=} opt_tileCallback Tile callback.
+   * @protected
+   */
+
+
+  CanvasTileLayerRenderer.prototype.manageTilePyramid = function (frameState, tileSource, tileGrid, pixelRatio, projection, extent, currentZ, preload, opt_tileCallback) {
+    var tileSourceKey = (0, _util.getUid)(tileSource);
+
+    if (!(tileSourceKey in frameState.wantedTiles)) {
+      frameState.wantedTiles[tileSourceKey] = {};
+    }
+
+    var wantedTiles = frameState.wantedTiles[tileSourceKey];
+    var tileQueue = frameState.tileQueue;
+    var minZoom = tileGrid.getMinZoom();
+    var tile, tileRange, tileResolution, x, y, z;
+
+    for (z = minZoom; z <= currentZ; ++z) {
+      tileRange = tileGrid.getTileRangeForExtentAndZ(extent, z, tileRange);
+      tileResolution = tileGrid.getResolution(z);
+
+      for (x = tileRange.minX; x <= tileRange.maxX; ++x) {
+        for (y = tileRange.minY; y <= tileRange.maxY; ++y) {
+          if (currentZ - z <= preload) {
+            tile = tileSource.getTile(z, x, y, pixelRatio, projection);
+
+            if (tile.getState() == _TileState.default.IDLE) {
+              wantedTiles[tile.getKey()] = true;
+
+              if (!tileQueue.isKeyQueued(tile.getKey())) {
+                tileQueue.enqueue([tile, tileSourceKey, tileGrid.getTileCoordCenter(tile.tileCoord), tileResolution]);
+              }
+            }
+
+            if (opt_tileCallback !== undefined) {
+              opt_tileCallback(tile);
+            }
+          } else {
+            tileSource.useTile(z, x, y, projection);
+          }
+        }
+      }
+    }
+  };
+
+  return CanvasTileLayerRenderer;
+}(_Layer.default);
+/**
+ * @function
+ * @return {import("../../layer/Tile.js").default|import("../../layer/VectorTile.js").default}
+ */
+
+
+CanvasTileLayerRenderer.prototype.getLayer;
+var _default = CanvasTileLayerRenderer;
+exports.default = _default;
+},{"../../util.js":"node_modules/ol/util.js","../../proj.js":"node_modules/ol/proj.js","../../TileRange.js":"node_modules/ol/TileRange.js","../../TileState.js":"node_modules/ol/TileState.js","../../extent.js":"node_modules/ol/extent.js","./Layer.js":"node_modules/ol/renderer/canvas/Layer.js","../../transform.js":"node_modules/ol/transform.js","../../array.js":"node_modules/ol/array.js","../../render/canvas.js":"node_modules/ol/render/canvas.js"}],"node_modules/ol/layer/Tile.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _BaseTile = _interopRequireDefault(require("./BaseTile.js"));
+
+var _TileLayer = _interopRequireDefault(require("../renderer/canvas/TileLayer.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/layer/Tile
+ */
+
+
+/**
+ * @classdesc
+ * For layer sources that provide pre-rendered, tiled images in grids that are
+ * organized by zoom levels for specific resolutions.
+ * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
+ * property on the layer object; for example, setting `title: 'My Title'` in the
+ * options means that `title` is observable, and has get/set accessors.
+ *
+ * @api
+ */
+var TileLayer =
+/** @class */
+function (_super) {
+  __extends(TileLayer, _super);
+  /**
+   * @param {import("./BaseTile.js").Options=} opt_options Tile layer options.
+   */
+
+
+  function TileLayer(opt_options) {
+    return _super.call(this, opt_options) || this;
+  }
+  /**
+   * Create a renderer for this layer.
+   * @return {import("../renderer/Layer.js").default} A layer renderer.
+   * @protected
+   */
+
+
+  TileLayer.prototype.createRenderer = function () {
+    return new _TileLayer.default(this);
+  };
+
+  return TileLayer;
+}(_BaseTile.default);
+
+var _default = TileLayer;
+exports.default = _default;
+},{"./BaseTile.js":"node_modules/ol/layer/BaseTile.js","../renderer/canvas/TileLayer.js":"node_modules/ol/renderer/canvas/TileLayer.js"}],"node_modules/ol/layer/BaseImage.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Layer = _interopRequireDefault(require("./Layer.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/layer/BaseImage
+ */
+
+
+/**
+ * @typedef {Object} Options
+ * @property {string} [className='ol-layer'] A CSS class name to set to the layer element.
+ * @property {number} [opacity=1] Opacity (0, 1).
+ * @property {boolean} [visible=true] Visibility.
+ * @property {import("../extent.js").Extent} [extent] The bounding extent for layer rendering.  The layer will not be
+ * rendered outside of this extent.
+ * @property {number} [zIndex] The z-index for layer rendering.  At rendering time, the layers
+ * will be ordered, first by Z-index and then by position. When `undefined`, a `zIndex` of 0 is assumed
+ * for layers that are added to the map's `layers` collection, or `Infinity` when the layer's `setMap()`
+ * method was used.
+ * @property {number} [minResolution] The minimum resolution (inclusive) at which this layer will be
+ * visible.
+ * @property {number} [maxResolution] The maximum resolution (exclusive) below which this layer will
+ * be visible.
+ * @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
+ * visible.
+ * @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
+ * be visible.
+ * @property {import("../PluggableMap.js").default} [map] Sets the layer as overlay on a map. The map will not manage
+ * this layer in its layers collection, and the layer will be rendered on top. This is useful for
+ * temporary layers. The standard way to add a layer to a map and have it managed by the map is to
+ * use {@link module:ol/Map#addLayer}.
+ * @property {import("../source/Image.js").default} [source] Source for this layer.
+ */
+
+/**
+ * @classdesc
+ * Server-rendered images that are available for arbitrary extents and
+ * resolutions.
+ * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
+ * property on the layer object; for example, setting `title: 'My Title'` in the
+ * options means that `title` is observable, and has get/set accessors.
+ *
+ * @extends {Layer<import("../source/Image.js").default>}
+ * @api
+ */
+var BaseImageLayer =
+/** @class */
+function (_super) {
+  __extends(BaseImageLayer, _super);
+  /**
+   * @param {Options=} opt_options Layer options.
+   */
+
+
+  function BaseImageLayer(opt_options) {
+    var _this = this;
+
+    var options = opt_options ? opt_options : {};
+    _this = _super.call(this, options) || this;
+    return _this;
+  }
+
+  return BaseImageLayer;
+}(_Layer.default);
+
+var _default = BaseImageLayer;
+exports.default = _default;
+},{"./Layer.js":"node_modules/ol/layer/Layer.js"}],"node_modules/ol/renderer/canvas/ImageLayer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _common = require("../../reproj/common.js");
+
+var _ViewHint = _interopRequireDefault(require("../../ViewHint.js"));
+
+var _extent = require("../../extent.js");
+
+var _proj = require("../../proj.js");
+
+var _Layer = _interopRequireDefault(require("./Layer.js"));
+
+var _transform = require("../../transform.js");
+
+var _canvas = require("../../render/canvas.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/renderer/canvas/ImageLayer
+ */
+
+
+/**
+ * @classdesc
+ * Canvas renderer for image layers.
+ * @api
+ */
+var CanvasImageLayerRenderer =
+/** @class */
+function (_super) {
+  __extends(CanvasImageLayerRenderer, _super);
+  /**
+   * @param {import("../../layer/Image.js").default} imageLayer Image layer.
+   */
+
+
+  function CanvasImageLayerRenderer(imageLayer) {
+    var _this = _super.call(this, imageLayer) || this;
+    /**
+     * @protected
+     * @type {?import("../../ImageBase.js").default}
+     */
+
+
+    _this.image_ = null;
+    return _this;
+  }
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasImageLayerRenderer.prototype.getImage = function () {
+    return !this.image_ ? null : this.image_.getImage();
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasImageLayerRenderer.prototype.prepareFrame = function (frameState) {
+    var layerState = frameState.layerStatesArray[frameState.layerIndex];
+    var pixelRatio = frameState.pixelRatio;
+    var viewState = frameState.viewState;
+    var viewResolution = viewState.resolution;
+    var imageSource = this.getLayer().getSource();
+    var hints = frameState.viewHints;
+    var renderedExtent = frameState.extent;
+
+    if (layerState.extent !== undefined) {
+      renderedExtent = (0, _extent.getIntersection)(renderedExtent, (0, _proj.fromUserExtent)(layerState.extent, viewState.projection));
+    }
+
+    if (!hints[_ViewHint.default.ANIMATING] && !hints[_ViewHint.default.INTERACTING] && !(0, _extent.isEmpty)(renderedExtent)) {
+      if (imageSource) {
+        var projection = viewState.projection;
+
+        if (!_common.ENABLE_RASTER_REPROJECTION) {
+          var sourceProjection = imageSource.getProjection();
+
+          if (sourceProjection) {
+            projection = sourceProjection;
+          }
+        }
+
+        var image = imageSource.getImage(renderedExtent, viewResolution, pixelRatio, projection);
+
+        if (image && this.loadImage(image)) {
+          this.image_ = image;
+        }
+      } else {
+        this.image_ = null;
+      }
+    }
+
+    return !!this.image_;
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  CanvasImageLayerRenderer.prototype.renderFrame = function (frameState, target) {
+    var image = this.image_;
+    var imageExtent = image.getExtent();
+    var imageResolution = image.getResolution();
+    var imagePixelRatio = image.getPixelRatio();
+    var layerState = frameState.layerStatesArray[frameState.layerIndex];
+    var pixelRatio = frameState.pixelRatio;
+    var viewState = frameState.viewState;
+    var viewCenter = viewState.center;
+    var viewResolution = viewState.resolution;
+    var size = frameState.size;
+    var scale = pixelRatio * imageResolution / (viewResolution * imagePixelRatio);
+    var width = Math.round(size[0] * pixelRatio);
+    var height = Math.round(size[1] * pixelRatio);
+    var rotation = viewState.rotation;
+
+    if (rotation) {
+      var size_1 = Math.round(Math.sqrt(width * width + height * height));
+      width = size_1;
+      height = size_1;
+    } // set forward and inverse pixel transforms
+
+
+    (0, _transform.compose)(this.pixelTransform, frameState.size[0] / 2, frameState.size[1] / 2, 1 / pixelRatio, 1 / pixelRatio, rotation, -width / 2, -height / 2);
+    (0, _transform.makeInverse)(this.inversePixelTransform, this.pixelTransform);
+    var canvasTransform = (0, _canvas.createTransformString)(this.pixelTransform);
+    this.useContainer(target, canvasTransform, layerState.opacity);
+    var context = this.context;
+    var canvas = context.canvas;
+
+    if (canvas.width != width || canvas.height != height) {
+      canvas.width = width;
+      canvas.height = height;
+    } else if (!this.containerReused) {
+      context.clearRect(0, 0, width, height);
+    } // clipped rendering if layer extent is set
+
+
+    var clipped = false;
+
+    if (layerState.extent) {
+      var layerExtent = (0, _proj.fromUserExtent)(layerState.extent, viewState.projection);
+      clipped = !(0, _extent.containsExtent)(layerExtent, frameState.extent) && (0, _extent.intersects)(layerExtent, frameState.extent);
+
+      if (clipped) {
+        this.clipUnrotated(context, frameState, layerExtent);
+      }
+    }
+
+    var img = image.getImage();
+    var transform = (0, _transform.compose)(this.tempTransform_, width / 2, height / 2, scale, scale, 0, imagePixelRatio * (imageExtent[0] - viewCenter[0]) / imageResolution, imagePixelRatio * (viewCenter[1] - imageExtent[3]) / imageResolution);
+    this.renderedResolution = imageResolution * pixelRatio / imagePixelRatio;
+    var dx = transform[4];
+    var dy = transform[5];
+    var dw = img.width * transform[0];
+    var dh = img.height * transform[3];
+    this.preRender(context, frameState);
+
+    if (dw >= 0.5 && dh >= 0.5) {
+      var opacity = layerState.opacity;
+      var previousAlpha = void 0;
+
+      if (opacity !== 1) {
+        previousAlpha = this.context.globalAlpha;
+        this.context.globalAlpha = opacity;
+      }
+
+      this.context.drawImage(img, 0, 0, +img.width, +img.height, Math.round(dx), Math.round(dy), Math.round(dw), Math.round(dh));
+
+      if (opacity !== 1) {
+        this.context.globalAlpha = previousAlpha;
+      }
+    }
+
+    this.postRender(context, frameState);
+
+    if (clipped) {
+      context.restore();
+    }
+
+    if (canvasTransform !== canvas.style.transform) {
+      canvas.style.transform = canvasTransform;
+    }
+
+    return this.container;
+  };
+
+  return CanvasImageLayerRenderer;
+}(_Layer.default);
+
+var _default = CanvasImageLayerRenderer;
+exports.default = _default;
+},{"../../reproj/common.js":"node_modules/ol/reproj/common.js","../../ViewHint.js":"node_modules/ol/ViewHint.js","../../extent.js":"node_modules/ol/extent.js","../../proj.js":"node_modules/ol/proj.js","./Layer.js":"node_modules/ol/renderer/canvas/Layer.js","../../transform.js":"node_modules/ol/transform.js","../../render/canvas.js":"node_modules/ol/render/canvas.js"}],"node_modules/ol/layer/Image.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _BaseImage = _interopRequireDefault(require("./BaseImage.js"));
+
+var _ImageLayer = _interopRequireDefault(require("../renderer/canvas/ImageLayer.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = void 0 && (void 0).__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+/**
+ * @module ol/layer/Image
+ */
+
+
+/**
+ * @classdesc
+ * Server-rendered images that are available for arbitrary extents and
+ * resolutions.
+ * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
+ * property on the layer object; for example, setting `title: 'My Title'` in the
+ * options means that `title` is observable, and has get/set accessors.
+ *
+ * @api
+ */
+var ImageLayer =
+/** @class */
+function (_super) {
+  __extends(ImageLayer, _super);
+  /**
+   * @param {import("./BaseImage.js").Options=} opt_options Layer options.
+   */
+
+
+  function ImageLayer(opt_options) {
+    return _super.call(this, opt_options) || this;
+  }
+  /**
+   * Create a renderer for this layer.
+   * @return {import("../renderer/Layer.js").default} A layer renderer.
+   * @protected
+   */
+
+
+  ImageLayer.prototype.createRenderer = function () {
+    return new _ImageLayer.default(this);
+  };
+
+  return ImageLayer;
+}(_BaseImage.default);
+
+var _default = ImageLayer;
+exports.default = _default;
+},{"./BaseImage.js":"node_modules/ol/layer/BaseImage.js","../renderer/canvas/ImageLayer.js":"node_modules/ol/renderer/canvas/ImageLayer.js"}],"node_modules/ol-popup/dist/ol-popup.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 (function (global, factory) {
@@ -61674,1267 +62934,7 @@ _core.default.version = '__VERSION__';
 (0, _projs.default)(_core.default);
 var _default = _core.default;
 exports.default = _default;
-},{"./core":"node_modules/proj4/lib/core.js","./Proj":"node_modules/proj4/lib/Proj.js","./Point":"node_modules/proj4/lib/Point.js","./common/toPoint":"node_modules/proj4/lib/common/toPoint.js","./defs":"node_modules/proj4/lib/defs.js","./transform":"node_modules/proj4/lib/transform.js","mgrs":"node_modules/mgrs/mgrs.js","../projs":"node_modules/proj4/projs.js"}],"node_modules/ol/layer/TileProperty.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-/**
- * @module ol/layer/TileProperty
- */
-
-/**
- * @enum {string}
- */
-var _default = {
-  PRELOAD: 'preload',
-  USE_INTERIM_TILES_ON_ERROR: 'useInterimTilesOnError'
-};
-exports.default = _default;
-},{}],"node_modules/ol/layer/BaseTile.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _Layer = _interopRequireDefault(require("./Layer.js"));
-
-var _TileProperty = _interopRequireDefault(require("./TileProperty.js"));
-
-var _obj = require("../obj.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/layer/BaseTile
- */
-
-
-/**
- * @typedef {Object} Options
- * @property {string} [className='ol-layer'] A CSS class name to set to the layer element.
- * @property {number} [opacity=1] Opacity (0, 1).
- * @property {boolean} [visible=true] Visibility.
- * @property {import("../extent.js").Extent} [extent] The bounding extent for layer rendering.  The layer will not be
- * rendered outside of this extent.
- * @property {number} [zIndex] The z-index for layer rendering.  At rendering time, the layers
- * will be ordered, first by Z-index and then by position. When `undefined`, a `zIndex` of 0 is assumed
- * for layers that are added to the map's `layers` collection, or `Infinity` when the layer's `setMap()`
- * method was used.
- * @property {number} [minResolution] The minimum resolution (inclusive) at which this layer will be
- * visible.
- * @property {number} [maxResolution] The maximum resolution (exclusive) below which this layer will
- * be visible.
- * @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
- * visible.
- * @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
- * be visible.
- * @property {number} [preload=0] Preload. Load low-resolution tiles up to `preload` levels. `0`
- * means no preloading.
- * @property {import("../source/Tile.js").default} [source] Source for this layer.
- * @property {import("../PluggableMap.js").default} [map] Sets the layer as overlay on a map. The map will not manage
- * this layer in its layers collection, and the layer will be rendered on top. This is useful for
- * temporary layers. The standard way to add a layer to a map and have it managed by the map is to
- * use {@link module:ol/Map#addLayer}.
- * @property {boolean} [useInterimTilesOnError=true] Use interim tiles on error.
- */
-
-/**
- * @classdesc
- * For layer sources that provide pre-rendered, tiled images in grids that are
- * organized by zoom levels for specific resolutions.
- * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
- * property on the layer object; for example, setting `title: 'My Title'` in the
- * options means that `title` is observable, and has get/set accessors.
- *
- * @extends {Layer<import("../source/Tile.js").default>}
- * @api
- */
-var BaseTileLayer =
-/** @class */
-function (_super) {
-  __extends(BaseTileLayer, _super);
-  /**
-   * @param {Options=} opt_options Tile layer options.
-   */
-
-
-  function BaseTileLayer(opt_options) {
-    var _this = this;
-
-    var options = opt_options ? opt_options : {};
-    var baseOptions = (0, _obj.assign)({}, options);
-    delete baseOptions.preload;
-    delete baseOptions.useInterimTilesOnError;
-    _this = _super.call(this, baseOptions) || this;
-
-    _this.setPreload(options.preload !== undefined ? options.preload : 0);
-
-    _this.setUseInterimTilesOnError(options.useInterimTilesOnError !== undefined ? options.useInterimTilesOnError : true);
-
-    return _this;
-  }
-  /**
-  * Return the level as number to which we will preload tiles up to.
-  * @return {number} The level to preload tiles up to.
-  * @observable
-  * @api
-  */
-
-
-  BaseTileLayer.prototype.getPreload = function () {
-    return (
-      /** @type {number} */
-      this.get(_TileProperty.default.PRELOAD)
-    );
-  };
-  /**
-  * Set the level as number to which we will preload tiles up to.
-  * @param {number} preload The level to preload tiles up to.
-  * @observable
-  * @api
-  */
-
-
-  BaseTileLayer.prototype.setPreload = function (preload) {
-    this.set(_TileProperty.default.PRELOAD, preload);
-  };
-  /**
-  * Whether we use interim tiles on error.
-  * @return {boolean} Use interim tiles on error.
-  * @observable
-  * @api
-  */
-
-
-  BaseTileLayer.prototype.getUseInterimTilesOnError = function () {
-    return (
-      /** @type {boolean} */
-      this.get(_TileProperty.default.USE_INTERIM_TILES_ON_ERROR)
-    );
-  };
-  /**
-  * Set whether we use interim tiles on error.
-  * @param {boolean} useInterimTilesOnError Use interim tiles on error.
-  * @observable
-  * @api
-  */
-
-
-  BaseTileLayer.prototype.setUseInterimTilesOnError = function (useInterimTilesOnError) {
-    this.set(_TileProperty.default.USE_INTERIM_TILES_ON_ERROR, useInterimTilesOnError);
-  };
-
-  return BaseTileLayer;
-}(_Layer.default);
-
-var _default = BaseTileLayer;
-exports.default = _default;
-},{"./Layer.js":"node_modules/ol/layer/Layer.js","./TileProperty.js":"node_modules/ol/layer/TileProperty.js","../obj.js":"node_modules/ol/obj.js"}],"node_modules/ol/renderer/canvas/TileLayer.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _util = require("../../util.js");
-
-var _proj = require("../../proj.js");
-
-var _TileRange = _interopRequireDefault(require("../../TileRange.js"));
-
-var _TileState = _interopRequireDefault(require("../../TileState.js"));
-
-var _extent = require("../../extent.js");
-
-var _Layer = _interopRequireDefault(require("./Layer.js"));
-
-var _transform = require("../../transform.js");
-
-var _array = require("../../array.js");
-
-var _canvas = require("../../render/canvas.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/renderer/canvas/TileLayer
- */
-
-
-/**
- * @classdesc
- * Canvas renderer for tile layers.
- * @api
- */
-var CanvasTileLayerRenderer =
-/** @class */
-function (_super) {
-  __extends(CanvasTileLayerRenderer, _super);
-  /**
-   * @param {import("../../layer/Tile.js").default|import("../../layer/VectorTile.js").default} tileLayer Tile layer.
-   */
-
-
-  function CanvasTileLayerRenderer(tileLayer) {
-    var _this = _super.call(this, tileLayer) || this;
-    /**
-     * Rendered extent has changed since the previous `renderFrame()` call
-     * @type {boolean}
-     */
-
-
-    _this.extentChanged = true;
-    /**
-     * @private
-     * @type {?import("../../extent.js").Extent}
-     */
-
-    _this.renderedExtent_ = null;
-    /**
-     * @protected
-     * @type {number}
-     */
-
-    _this.renderedPixelRatio;
-    /**
-     * @protected
-     * @type {import("../../proj/Projection.js").default}
-     */
-
-    _this.renderedProjection = null;
-    /**
-     * @protected
-     * @type {number}
-     */
-
-    _this.renderedRevision;
-    /**
-     * @protected
-     * @type {!Array<import("../../Tile.js").default>}
-     */
-
-    _this.renderedTiles = [];
-    /**
-     * @private
-     * @type {boolean}
-     */
-
-    _this.newTiles_ = false;
-    /**
-     * @protected
-     * @type {import("../../extent.js").Extent}
-     */
-
-    _this.tmpExtent = (0, _extent.createEmpty)();
-    /**
-     * @private
-     * @type {import("../../TileRange.js").default}
-     */
-
-    _this.tmpTileRange_ = new _TileRange.default(0, 0, 0, 0);
-    return _this;
-  }
-  /**
-   * @protected
-   * @param {import("../../Tile.js").default} tile Tile.
-   * @return {boolean} Tile is drawable.
-   */
-
-
-  CanvasTileLayerRenderer.prototype.isDrawableTile = function (tile) {
-    var tileLayer = this.getLayer();
-    var tileState = tile.getState();
-    var useInterimTilesOnError = tileLayer.getUseInterimTilesOnError();
-    return tileState == _TileState.default.LOADED || tileState == _TileState.default.EMPTY || tileState == _TileState.default.ERROR && !useInterimTilesOnError;
-  };
-  /**
-   * @param {number} z Tile coordinate z.
-   * @param {number} x Tile coordinate x.
-   * @param {number} y Tile coordinate y.
-   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
-   * @return {!import("../../Tile.js").default} Tile.
-   */
-
-
-  CanvasTileLayerRenderer.prototype.getTile = function (z, x, y, frameState) {
-    var pixelRatio = frameState.pixelRatio;
-    var projection = frameState.viewState.projection;
-    var tileLayer = this.getLayer();
-    var tileSource = tileLayer.getSource();
-    var tile = tileSource.getTile(z, x, y, pixelRatio, projection);
-
-    if (tile.getState() == _TileState.default.ERROR) {
-      if (!tileLayer.getUseInterimTilesOnError()) {
-        // When useInterimTilesOnError is false, we consider the error tile as loaded.
-        tile.setState(_TileState.default.LOADED);
-      } else if (tileLayer.getPreload() > 0) {
-        // Preloaded tiles for lower resolutions might have finished loading.
-        this.newTiles_ = true;
-      }
-    }
-
-    if (!this.isDrawableTile(tile)) {
-      tile = tile.getInterimTile();
-    }
-
-    return tile;
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasTileLayerRenderer.prototype.loadedTileCallback = function (tiles, zoom, tile) {
-    if (this.isDrawableTile(tile)) {
-      return _super.prototype.loadedTileCallback.call(this, tiles, zoom, tile);
-    }
-
-    return false;
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasTileLayerRenderer.prototype.prepareFrame = function (frameState) {
-    return !!this.getLayer().getSource();
-  };
-  /**
-   * TODO: File a TypeScript issue about inheritDoc not being followed
-   * all the way.  Without this explicit return type, the VectorTileLayer
-   * renderFrame function does not pass.
-   *
-   * @inheritDoc
-   * @returns {HTMLElement} The rendered element.
-   */
-
-
-  CanvasTileLayerRenderer.prototype.renderFrame = function (frameState, target) {
-    var layerState = frameState.layerStatesArray[frameState.layerIndex];
-    var viewState = frameState.viewState;
-    var projection = viewState.projection;
-    var viewResolution = viewState.resolution;
-    var viewCenter = viewState.center;
-    var rotation = viewState.rotation;
-    var pixelRatio = frameState.pixelRatio;
-    var tileLayer = this.getLayer();
-    var tileSource = tileLayer.getSource();
-    var sourceRevision = tileSource.getRevision();
-    var tileGrid = tileSource.getTileGridForProjection(projection);
-    var z = tileGrid.getZForResolution(viewResolution, tileSource.zDirection);
-    var tileResolution = tileGrid.getResolution(z);
-    var extent = frameState.extent;
-    var layerExtent = layerState.extent && (0, _proj.fromUserExtent)(layerState.extent, projection);
-
-    if (layerExtent) {
-      extent = (0, _extent.getIntersection)(extent, (0, _proj.fromUserExtent)(layerState.extent, projection));
-    }
-
-    var tilePixelRatio = tileSource.getTilePixelRatio(pixelRatio); // desired dimensions of the canvas in pixels
-
-    var width = Math.round(frameState.size[0] * tilePixelRatio);
-    var height = Math.round(frameState.size[1] * tilePixelRatio);
-
-    if (rotation) {
-      var size = Math.round(Math.sqrt(width * width + height * height));
-      width = size;
-      height = size;
-    }
-
-    var dx = tileResolution * width / 2 / tilePixelRatio;
-    var dy = tileResolution * height / 2 / tilePixelRatio;
-    var canvasExtent = [viewCenter[0] - dx, viewCenter[1] - dy, viewCenter[0] + dx, viewCenter[1] + dy];
-    var tileRange = tileGrid.getTileRangeForExtentAndZ(extent, z);
-    /**
-     * @type {Object<number, Object<string, import("../../Tile.js").default>>}
-     */
-
-    var tilesToDrawByZ = {};
-    tilesToDrawByZ[z] = {};
-    var findLoadedTiles = this.createLoadedTileFinder(tileSource, projection, tilesToDrawByZ);
-    var tmpExtent = this.tmpExtent;
-    var tmpTileRange = this.tmpTileRange_;
-    this.newTiles_ = false;
-
-    for (var x = tileRange.minX; x <= tileRange.maxX; ++x) {
-      for (var y = tileRange.minY; y <= tileRange.maxY; ++y) {
-        var tile = this.getTile(z, x, y, frameState);
-
-        if (this.isDrawableTile(tile)) {
-          var uid = (0, _util.getUid)(this);
-
-          if (tile.getState() == _TileState.default.LOADED) {
-            tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
-            var inTransition = tile.inTransition(uid);
-
-            if (!this.newTiles_ && (inTransition || this.renderedTiles.indexOf(tile) === -1)) {
-              this.newTiles_ = true;
-            }
-          }
-
-          if (tile.getAlpha(uid, frameState.time) === 1) {
-            // don't look for alt tiles if alpha is 1
-            continue;
-          }
-        }
-
-        var childTileRange = tileGrid.getTileCoordChildTileRange(tile.tileCoord, tmpTileRange, tmpExtent);
-        var covered = false;
-
-        if (childTileRange) {
-          covered = findLoadedTiles(z + 1, childTileRange);
-        }
-
-        if (!covered) {
-          tileGrid.forEachTileCoordParentTileRange(tile.tileCoord, findLoadedTiles, tmpTileRange, tmpExtent);
-        }
-      }
-    }
-
-    var canvasScale = tileResolution / viewResolution; // set forward and inverse pixel transforms
-
-    (0, _transform.compose)(this.pixelTransform, frameState.size[0] / 2, frameState.size[1] / 2, 1 / tilePixelRatio, 1 / tilePixelRatio, rotation, -width / 2, -height / 2);
-    var canvasTransform = (0, _canvas.createTransformString)(this.pixelTransform);
-    this.useContainer(target, canvasTransform, layerState.opacity);
-    var context = this.context;
-    var canvas = context.canvas;
-    (0, _transform.makeInverse)(this.inversePixelTransform, this.pixelTransform); // set scale transform for calculating tile positions on the canvas
-
-    (0, _transform.compose)(this.tempTransform_, width / 2, height / 2, canvasScale, canvasScale, 0, -width / 2, -height / 2);
-
-    if (canvas.width != width || canvas.height != height) {
-      canvas.width = width;
-      canvas.height = height;
-    } else if (!this.containerReused) {
-      context.clearRect(0, 0, width, height);
-    }
-
-    if (layerExtent) {
-      this.clipUnrotated(context, frameState, layerExtent);
-    }
-
-    this.preRender(context, frameState);
-    this.renderedTiles.length = 0;
-    /** @type {Array<number>} */
-
-    var zs = Object.keys(tilesToDrawByZ).map(Number);
-    zs.sort(_array.numberSafeCompareFunction);
-    var clips, clipZs, currentClip;
-
-    if (layerState.opacity === 1 && (!this.containerReused || tileSource.getOpaque(frameState.viewState.projection))) {
-      zs = zs.reverse();
-    } else {
-      clips = [];
-      clipZs = [];
-    }
-
-    for (var i = zs.length - 1; i >= 0; --i) {
-      var currentZ = zs[i];
-      var currentTilePixelSize = tileSource.getTilePixelSize(currentZ, pixelRatio, projection);
-      var currentResolution = tileGrid.getResolution(currentZ);
-      var currentScale = currentResolution / tileResolution;
-      var dx_1 = currentTilePixelSize[0] * currentScale * canvasScale;
-      var dy_1 = currentTilePixelSize[1] * currentScale * canvasScale;
-      var originTileCoord = tileGrid.getTileCoordForCoordAndZ((0, _extent.getTopLeft)(canvasExtent), currentZ);
-      var originTileExtent = tileGrid.getTileCoordExtent(originTileCoord);
-      var origin_1 = (0, _transform.apply)(this.tempTransform_, [tilePixelRatio * (originTileExtent[0] - canvasExtent[0]) / tileResolution, tilePixelRatio * (canvasExtent[3] - originTileExtent[3]) / tileResolution]);
-      var tileGutter = tilePixelRatio * tileSource.getGutterForProjection(projection);
-      var tilesToDraw = tilesToDrawByZ[currentZ];
-
-      for (var tileCoordKey in tilesToDraw) {
-        var tile =
-        /** @type {import("../../ImageTile.js").default} */
-        tilesToDraw[tileCoordKey];
-        var tileCoord = tile.tileCoord; // Calculate integer positions and sizes so that tiles align
-
-        var floatX = origin_1[0] - (originTileCoord[1] - tileCoord[1]) * dx_1;
-        var nextX = Math.round(floatX + dx_1);
-        var floatY = origin_1[1] - (originTileCoord[2] - tileCoord[2]) * dy_1;
-        var nextY = Math.round(floatY + dy_1);
-        var x = Math.round(floatX);
-        var y = Math.round(floatY);
-        var w = nextX - x;
-        var h = nextY - y;
-        var transition = z === currentZ;
-        var inTransition = transition && tile.getAlpha((0, _util.getUid)(this), frameState.time) !== 1;
-
-        if (!inTransition) {
-          if (clips) {
-            // Clip mask for regions in this tile that already filled by a higher z tile
-            context.save();
-            currentClip = [x, y, x + w, y, x + w, y + h, x, y + h];
-
-            for (var i_1 = 0, ii = clips.length; i_1 < ii; ++i_1) {
-              if (z !== currentZ && currentZ < clipZs[i_1]) {
-                var clip = clips[i_1];
-                context.beginPath(); // counter-clockwise (outer ring) for current tile
-
-                context.moveTo(currentClip[0], currentClip[1]);
-                context.lineTo(currentClip[2], currentClip[3]);
-                context.lineTo(currentClip[4], currentClip[5]);
-                context.lineTo(currentClip[6], currentClip[7]); // clockwise (inner ring) for higher z tile
-
-                context.moveTo(clip[6], clip[7]);
-                context.lineTo(clip[4], clip[5]);
-                context.lineTo(clip[2], clip[3]);
-                context.lineTo(clip[0], clip[1]);
-                context.clip();
-              }
-            }
-
-            clips.push(currentClip);
-            clipZs.push(currentZ);
-          } else {
-            context.clearRect(x, y, w, h);
-          }
-        }
-
-        this.drawTileImage(tile, frameState, x, y, w, h, tileGutter, transition, layerState.opacity);
-
-        if (clips && !inTransition) {
-          context.restore();
-        }
-
-        this.renderedTiles.push(tile);
-        this.updateUsedTiles(frameState.usedTiles, tileSource, tile);
-      }
-    }
-
-    this.renderedRevision = sourceRevision;
-    this.renderedResolution = tileResolution;
-    this.extentChanged = !this.renderedExtent_ || !(0, _extent.equals)(this.renderedExtent_, canvasExtent);
-    this.renderedExtent_ = canvasExtent;
-    this.renderedPixelRatio = pixelRatio;
-    this.renderedProjection = projection;
-    this.manageTilePyramid(frameState, tileSource, tileGrid, pixelRatio, projection, extent, z, tileLayer.getPreload());
-    this.scheduleExpireCache(frameState, tileSource);
-    this.postRender(context, frameState);
-
-    if (layerState.extent) {
-      context.restore();
-    }
-
-    if (canvasTransform !== canvas.style.transform) {
-      canvas.style.transform = canvasTransform;
-    }
-
-    return this.container;
-  };
-  /**
-   * @param {import("../../ImageTile.js").default} tile Tile.
-   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
-   * @param {number} x Left of the tile.
-   * @param {number} y Top of the tile.
-   * @param {number} w Width of the tile.
-   * @param {number} h Height of the tile.
-   * @param {number} gutter Tile gutter.
-   * @param {boolean} transition Apply an alpha transition.
-   * @param {number} opacity Opacity.
-   */
-
-
-  CanvasTileLayerRenderer.prototype.drawTileImage = function (tile, frameState, x, y, w, h, gutter, transition, opacity) {
-    var image = this.getTileImage(tile);
-
-    if (!image) {
-      return;
-    }
-
-    var uid = (0, _util.getUid)(this);
-    var tileAlpha = transition ? tile.getAlpha(uid, frameState.time) : 1;
-    var alpha = opacity * tileAlpha;
-    var alphaChanged = alpha !== this.context.globalAlpha;
-
-    if (alphaChanged) {
-      this.context.save();
-      this.context.globalAlpha = alpha;
-    }
-
-    this.context.drawImage(image, gutter, gutter, image.width - 2 * gutter, image.height - 2 * gutter, x, y, w, h);
-
-    if (alphaChanged) {
-      this.context.restore();
-    }
-
-    if (tileAlpha !== 1) {
-      frameState.animate = true;
-    } else if (transition) {
-      tile.endTransition(uid);
-    }
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasTileLayerRenderer.prototype.getImage = function () {
-    var context = this.context;
-    return context ? context.canvas : null;
-  };
-  /**
-   * Get the image from a tile.
-   * @param {import("../../ImageTile.js").default} tile Tile.
-   * @return {HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} Image.
-   * @protected
-   */
-
-
-  CanvasTileLayerRenderer.prototype.getTileImage = function (tile) {
-    return tile.getImage();
-  };
-  /**
-   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
-   * @param {import("../../source/Tile.js").default} tileSource Tile source.
-   * @protected
-   */
-
-
-  CanvasTileLayerRenderer.prototype.scheduleExpireCache = function (frameState, tileSource) {
-    if (tileSource.canExpireCache()) {
-      /**
-       * @param {import("../../source/Tile.js").default} tileSource Tile source.
-       * @param {import("../../PluggableMap.js").default} map Map.
-       * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
-       */
-      var postRenderFunction = function (tileSource, map, frameState) {
-        var tileSourceKey = (0, _util.getUid)(tileSource);
-
-        if (tileSourceKey in frameState.usedTiles) {
-          tileSource.expireCache(frameState.viewState.projection, frameState.usedTiles[tileSourceKey]);
-        }
-      }.bind(null, tileSource);
-
-      frameState.postRenderFunctions.push(
-      /** @type {import("../../PluggableMap.js").PostRenderFunction} */
-      postRenderFunction);
-    }
-  };
-  /**
-   * @param {!Object<string, !Object<string, boolean>>} usedTiles Used tiles.
-   * @param {import("../../source/Tile.js").default} tileSource Tile source.
-   * @param {import('../../Tile.js').default} tile Tile.
-   * @protected
-   */
-
-
-  CanvasTileLayerRenderer.prototype.updateUsedTiles = function (usedTiles, tileSource, tile) {
-    // FIXME should we use tilesToDrawByZ instead?
-    var tileSourceKey = (0, _util.getUid)(tileSource);
-
-    if (!(tileSourceKey in usedTiles)) {
-      usedTiles[tileSourceKey] = {};
-    }
-
-    usedTiles[tileSourceKey][tile.getKey()] = true;
-  };
-  /**
-   * Manage tile pyramid.
-   * This function performs a number of functions related to the tiles at the
-   * current zoom and lower zoom levels:
-   * - registers idle tiles in frameState.wantedTiles so that they are not
-   *   discarded by the tile queue
-   * - enqueues missing tiles
-   * @param {import("../../PluggableMap.js").FrameState} frameState Frame state.
-   * @param {import("../../source/Tile.js").default} tileSource Tile source.
-   * @param {import("../../tilegrid/TileGrid.js").default} tileGrid Tile grid.
-   * @param {number} pixelRatio Pixel ratio.
-   * @param {import("../../proj/Projection.js").default} projection Projection.
-   * @param {import("../../extent.js").Extent} extent Extent.
-   * @param {number} currentZ Current Z.
-   * @param {number} preload Load low resolution tiles up to 'preload' levels.
-   * @param {function(import("../../Tile.js").default)=} opt_tileCallback Tile callback.
-   * @protected
-   */
-
-
-  CanvasTileLayerRenderer.prototype.manageTilePyramid = function (frameState, tileSource, tileGrid, pixelRatio, projection, extent, currentZ, preload, opt_tileCallback) {
-    var tileSourceKey = (0, _util.getUid)(tileSource);
-
-    if (!(tileSourceKey in frameState.wantedTiles)) {
-      frameState.wantedTiles[tileSourceKey] = {};
-    }
-
-    var wantedTiles = frameState.wantedTiles[tileSourceKey];
-    var tileQueue = frameState.tileQueue;
-    var minZoom = tileGrid.getMinZoom();
-    var tile, tileRange, tileResolution, x, y, z;
-
-    for (z = minZoom; z <= currentZ; ++z) {
-      tileRange = tileGrid.getTileRangeForExtentAndZ(extent, z, tileRange);
-      tileResolution = tileGrid.getResolution(z);
-
-      for (x = tileRange.minX; x <= tileRange.maxX; ++x) {
-        for (y = tileRange.minY; y <= tileRange.maxY; ++y) {
-          if (currentZ - z <= preload) {
-            tile = tileSource.getTile(z, x, y, pixelRatio, projection);
-
-            if (tile.getState() == _TileState.default.IDLE) {
-              wantedTiles[tile.getKey()] = true;
-
-              if (!tileQueue.isKeyQueued(tile.getKey())) {
-                tileQueue.enqueue([tile, tileSourceKey, tileGrid.getTileCoordCenter(tile.tileCoord), tileResolution]);
-              }
-            }
-
-            if (opt_tileCallback !== undefined) {
-              opt_tileCallback(tile);
-            }
-          } else {
-            tileSource.useTile(z, x, y, projection);
-          }
-        }
-      }
-    }
-  };
-
-  return CanvasTileLayerRenderer;
-}(_Layer.default);
-/**
- * @function
- * @return {import("../../layer/Tile.js").default|import("../../layer/VectorTile.js").default}
- */
-
-
-CanvasTileLayerRenderer.prototype.getLayer;
-var _default = CanvasTileLayerRenderer;
-exports.default = _default;
-},{"../../util.js":"node_modules/ol/util.js","../../proj.js":"node_modules/ol/proj.js","../../TileRange.js":"node_modules/ol/TileRange.js","../../TileState.js":"node_modules/ol/TileState.js","../../extent.js":"node_modules/ol/extent.js","./Layer.js":"node_modules/ol/renderer/canvas/Layer.js","../../transform.js":"node_modules/ol/transform.js","../../array.js":"node_modules/ol/array.js","../../render/canvas.js":"node_modules/ol/render/canvas.js"}],"node_modules/ol/layer/Tile.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _BaseTile = _interopRequireDefault(require("./BaseTile.js"));
-
-var _TileLayer = _interopRequireDefault(require("../renderer/canvas/TileLayer.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/layer/Tile
- */
-
-
-/**
- * @classdesc
- * For layer sources that provide pre-rendered, tiled images in grids that are
- * organized by zoom levels for specific resolutions.
- * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
- * property on the layer object; for example, setting `title: 'My Title'` in the
- * options means that `title` is observable, and has get/set accessors.
- *
- * @api
- */
-var TileLayer =
-/** @class */
-function (_super) {
-  __extends(TileLayer, _super);
-  /**
-   * @param {import("./BaseTile.js").Options=} opt_options Tile layer options.
-   */
-
-
-  function TileLayer(opt_options) {
-    return _super.call(this, opt_options) || this;
-  }
-  /**
-   * Create a renderer for this layer.
-   * @return {import("../renderer/Layer.js").default} A layer renderer.
-   * @protected
-   */
-
-
-  TileLayer.prototype.createRenderer = function () {
-    return new _TileLayer.default(this);
-  };
-
-  return TileLayer;
-}(_BaseTile.default);
-
-var _default = TileLayer;
-exports.default = _default;
-},{"./BaseTile.js":"node_modules/ol/layer/BaseTile.js","../renderer/canvas/TileLayer.js":"node_modules/ol/renderer/canvas/TileLayer.js"}],"node_modules/ol/layer/BaseImage.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _Layer = _interopRequireDefault(require("./Layer.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/layer/BaseImage
- */
-
-
-/**
- * @typedef {Object} Options
- * @property {string} [className='ol-layer'] A CSS class name to set to the layer element.
- * @property {number} [opacity=1] Opacity (0, 1).
- * @property {boolean} [visible=true] Visibility.
- * @property {import("../extent.js").Extent} [extent] The bounding extent for layer rendering.  The layer will not be
- * rendered outside of this extent.
- * @property {number} [zIndex] The z-index for layer rendering.  At rendering time, the layers
- * will be ordered, first by Z-index and then by position. When `undefined`, a `zIndex` of 0 is assumed
- * for layers that are added to the map's `layers` collection, or `Infinity` when the layer's `setMap()`
- * method was used.
- * @property {number} [minResolution] The minimum resolution (inclusive) at which this layer will be
- * visible.
- * @property {number} [maxResolution] The maximum resolution (exclusive) below which this layer will
- * be visible.
- * @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
- * visible.
- * @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
- * be visible.
- * @property {import("../PluggableMap.js").default} [map] Sets the layer as overlay on a map. The map will not manage
- * this layer in its layers collection, and the layer will be rendered on top. This is useful for
- * temporary layers. The standard way to add a layer to a map and have it managed by the map is to
- * use {@link module:ol/Map#addLayer}.
- * @property {import("../source/Image.js").default} [source] Source for this layer.
- */
-
-/**
- * @classdesc
- * Server-rendered images that are available for arbitrary extents and
- * resolutions.
- * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
- * property on the layer object; for example, setting `title: 'My Title'` in the
- * options means that `title` is observable, and has get/set accessors.
- *
- * @extends {Layer<import("../source/Image.js").default>}
- * @api
- */
-var BaseImageLayer =
-/** @class */
-function (_super) {
-  __extends(BaseImageLayer, _super);
-  /**
-   * @param {Options=} opt_options Layer options.
-   */
-
-
-  function BaseImageLayer(opt_options) {
-    var _this = this;
-
-    var options = opt_options ? opt_options : {};
-    _this = _super.call(this, options) || this;
-    return _this;
-  }
-
-  return BaseImageLayer;
-}(_Layer.default);
-
-var _default = BaseImageLayer;
-exports.default = _default;
-},{"./Layer.js":"node_modules/ol/layer/Layer.js"}],"node_modules/ol/renderer/canvas/ImageLayer.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _common = require("../../reproj/common.js");
-
-var _ViewHint = _interopRequireDefault(require("../../ViewHint.js"));
-
-var _extent = require("../../extent.js");
-
-var _proj = require("../../proj.js");
-
-var _Layer = _interopRequireDefault(require("./Layer.js"));
-
-var _transform = require("../../transform.js");
-
-var _canvas = require("../../render/canvas.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/renderer/canvas/ImageLayer
- */
-
-
-/**
- * @classdesc
- * Canvas renderer for image layers.
- * @api
- */
-var CanvasImageLayerRenderer =
-/** @class */
-function (_super) {
-  __extends(CanvasImageLayerRenderer, _super);
-  /**
-   * @param {import("../../layer/Image.js").default} imageLayer Image layer.
-   */
-
-
-  function CanvasImageLayerRenderer(imageLayer) {
-    var _this = _super.call(this, imageLayer) || this;
-    /**
-     * @protected
-     * @type {?import("../../ImageBase.js").default}
-     */
-
-
-    _this.image_ = null;
-    return _this;
-  }
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasImageLayerRenderer.prototype.getImage = function () {
-    return !this.image_ ? null : this.image_.getImage();
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasImageLayerRenderer.prototype.prepareFrame = function (frameState) {
-    var layerState = frameState.layerStatesArray[frameState.layerIndex];
-    var pixelRatio = frameState.pixelRatio;
-    var viewState = frameState.viewState;
-    var viewResolution = viewState.resolution;
-    var imageSource = this.getLayer().getSource();
-    var hints = frameState.viewHints;
-    var renderedExtent = frameState.extent;
-
-    if (layerState.extent !== undefined) {
-      renderedExtent = (0, _extent.getIntersection)(renderedExtent, (0, _proj.fromUserExtent)(layerState.extent, viewState.projection));
-    }
-
-    if (!hints[_ViewHint.default.ANIMATING] && !hints[_ViewHint.default.INTERACTING] && !(0, _extent.isEmpty)(renderedExtent)) {
-      if (imageSource) {
-        var projection = viewState.projection;
-
-        if (!_common.ENABLE_RASTER_REPROJECTION) {
-          var sourceProjection = imageSource.getProjection();
-
-          if (sourceProjection) {
-            projection = sourceProjection;
-          }
-        }
-
-        var image = imageSource.getImage(renderedExtent, viewResolution, pixelRatio, projection);
-
-        if (image && this.loadImage(image)) {
-          this.image_ = image;
-        }
-      } else {
-        this.image_ = null;
-      }
-    }
-
-    return !!this.image_;
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  CanvasImageLayerRenderer.prototype.renderFrame = function (frameState, target) {
-    var image = this.image_;
-    var imageExtent = image.getExtent();
-    var imageResolution = image.getResolution();
-    var imagePixelRatio = image.getPixelRatio();
-    var layerState = frameState.layerStatesArray[frameState.layerIndex];
-    var pixelRatio = frameState.pixelRatio;
-    var viewState = frameState.viewState;
-    var viewCenter = viewState.center;
-    var viewResolution = viewState.resolution;
-    var size = frameState.size;
-    var scale = pixelRatio * imageResolution / (viewResolution * imagePixelRatio);
-    var width = Math.round(size[0] * pixelRatio);
-    var height = Math.round(size[1] * pixelRatio);
-    var rotation = viewState.rotation;
-
-    if (rotation) {
-      var size_1 = Math.round(Math.sqrt(width * width + height * height));
-      width = size_1;
-      height = size_1;
-    } // set forward and inverse pixel transforms
-
-
-    (0, _transform.compose)(this.pixelTransform, frameState.size[0] / 2, frameState.size[1] / 2, 1 / pixelRatio, 1 / pixelRatio, rotation, -width / 2, -height / 2);
-    (0, _transform.makeInverse)(this.inversePixelTransform, this.pixelTransform);
-    var canvasTransform = (0, _canvas.createTransformString)(this.pixelTransform);
-    this.useContainer(target, canvasTransform, layerState.opacity);
-    var context = this.context;
-    var canvas = context.canvas;
-
-    if (canvas.width != width || canvas.height != height) {
-      canvas.width = width;
-      canvas.height = height;
-    } else if (!this.containerReused) {
-      context.clearRect(0, 0, width, height);
-    } // clipped rendering if layer extent is set
-
-
-    var clipped = false;
-
-    if (layerState.extent) {
-      var layerExtent = (0, _proj.fromUserExtent)(layerState.extent, viewState.projection);
-      clipped = !(0, _extent.containsExtent)(layerExtent, frameState.extent) && (0, _extent.intersects)(layerExtent, frameState.extent);
-
-      if (clipped) {
-        this.clipUnrotated(context, frameState, layerExtent);
-      }
-    }
-
-    var img = image.getImage();
-    var transform = (0, _transform.compose)(this.tempTransform_, width / 2, height / 2, scale, scale, 0, imagePixelRatio * (imageExtent[0] - viewCenter[0]) / imageResolution, imagePixelRatio * (viewCenter[1] - imageExtent[3]) / imageResolution);
-    this.renderedResolution = imageResolution * pixelRatio / imagePixelRatio;
-    var dx = transform[4];
-    var dy = transform[5];
-    var dw = img.width * transform[0];
-    var dh = img.height * transform[3];
-    this.preRender(context, frameState);
-
-    if (dw >= 0.5 && dh >= 0.5) {
-      var opacity = layerState.opacity;
-      var previousAlpha = void 0;
-
-      if (opacity !== 1) {
-        previousAlpha = this.context.globalAlpha;
-        this.context.globalAlpha = opacity;
-      }
-
-      this.context.drawImage(img, 0, 0, +img.width, +img.height, Math.round(dx), Math.round(dy), Math.round(dw), Math.round(dh));
-
-      if (opacity !== 1) {
-        this.context.globalAlpha = previousAlpha;
-      }
-    }
-
-    this.postRender(context, frameState);
-
-    if (clipped) {
-      context.restore();
-    }
-
-    if (canvasTransform !== canvas.style.transform) {
-      canvas.style.transform = canvasTransform;
-    }
-
-    return this.container;
-  };
-
-  return CanvasImageLayerRenderer;
-}(_Layer.default);
-
-var _default = CanvasImageLayerRenderer;
-exports.default = _default;
-},{"../../reproj/common.js":"node_modules/ol/reproj/common.js","../../ViewHint.js":"node_modules/ol/ViewHint.js","../../extent.js":"node_modules/ol/extent.js","../../proj.js":"node_modules/ol/proj.js","./Layer.js":"node_modules/ol/renderer/canvas/Layer.js","../../transform.js":"node_modules/ol/transform.js","../../render/canvas.js":"node_modules/ol/render/canvas.js"}],"node_modules/ol/layer/Image.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _BaseImage = _interopRequireDefault(require("./BaseImage.js"));
-
-var _ImageLayer = _interopRequireDefault(require("../renderer/canvas/ImageLayer.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var __extends = void 0 && (void 0).__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
-
-    return extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-/**
- * @module ol/layer/Image
- */
-
-
-/**
- * @classdesc
- * Server-rendered images that are available for arbitrary extents and
- * resolutions.
- * Note that any property set in the options is set as a {@link module:ol/Object~BaseObject}
- * property on the layer object; for example, setting `title: 'My Title'` in the
- * options means that `title` is observable, and has get/set accessors.
- *
- * @api
- */
-var ImageLayer =
-/** @class */
-function (_super) {
-  __extends(ImageLayer, _super);
-  /**
-   * @param {import("./BaseImage.js").Options=} opt_options Layer options.
-   */
-
-
-  function ImageLayer(opt_options) {
-    return _super.call(this, opt_options) || this;
-  }
-  /**
-   * Create a renderer for this layer.
-   * @return {import("../renderer/Layer.js").default} A layer renderer.
-   * @protected
-   */
-
-
-  ImageLayer.prototype.createRenderer = function () {
-    return new _ImageLayer.default(this);
-  };
-
-  return ImageLayer;
-}(_BaseImage.default);
-
-var _default = ImageLayer;
-exports.default = _default;
-},{"./BaseImage.js":"node_modules/ol/layer/BaseImage.js","../renderer/canvas/ImageLayer.js":"node_modules/ol/renderer/canvas/ImageLayer.js"}],"node_modules/ol/source/common.js":[function(require,module,exports) {
+},{"./core":"node_modules/proj4/lib/core.js","./Proj":"node_modules/proj4/lib/Proj.js","./Point":"node_modules/proj4/lib/Point.js","./common/toPoint":"node_modules/proj4/lib/common/toPoint.js","./defs":"node_modules/proj4/lib/defs.js","./transform":"node_modules/proj4/lib/transform.js","mgrs":"node_modules/mgrs/mgrs.js","../projs":"node_modules/proj4/projs.js"}],"node_modules/ol/source/common.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -83887,7 +83887,7 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.transactWFS = exports.vectorSource = exports.wmsSource = void 0;
+exports.deletePoint = exports.addPoint = exports.getPopupData = exports.vectorSource = exports.wmsSource = void 0;
 
 var _ImageWMS = _interopRequireDefault(require("ol/source/ImageWMS"));
 
@@ -83977,9 +83977,34 @@ var transactWFS = function transactWFS(mode, f) {
       });
     }
   });
+}; // Retrieve popup data
+
+
+var getPopupData = function getPopupData(coordinate, resolution) {
+  // get wms url
+  var url = wmsSource.getFeatureInfoUrl(coordinate, resolution, 'EPSG:2248', {
+    'INFO_FORMAT': 'application/json'
+  }); // request wms service
+
+  if (url) {
+    return $.ajax(url);
+  }
+}; // Menu functions
+
+
+exports.getPopupData = getPopupData;
+
+var addPoint = function addPoint(obj) {
+  transactWFS('insert', obj.data.point);
 };
 
-exports.transactWFS = transactWFS;
+exports.addPoint = addPoint;
+
+var deletePoint = function deletePoint(obj) {
+  transactWFS('delete', obj.data.point);
+};
+
+exports.deletePoint = deletePoint;
 },{"ol/source/ImageWMS":"node_modules/ol/source/ImageWMS.js","ol/source/Vector":"node_modules/ol/source/Vector.js","ol/format/GeoJSON":"node_modules/ol/format/GeoJSON.js","ol/format/GML2":"node_modules/ol/format/GML2.js","ol/format/WFS":"node_modules/ol/format/WFS.js","ol/loadingstrategy":"node_modules/ol/loadingstrategy.js","./jquery-import":"jquery-import.js"}],"highlight.js":[function(require,module,exports) {
 "use strict";
 
@@ -84027,6 +84052,12 @@ var _Feature = _interopRequireDefault(require("ol/Feature"));
 
 var _Point = _interopRequireDefault(require("ol/geom/Point"));
 
+var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
+
+var _Image = _interopRequireDefault(require("ol/layer/Image"));
+
+var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
+
 var _olPopup2 = _interopRequireDefault(require("ol-popup"));
 
 var _olContextmenu2 = _interopRequireDefault(require("ol-contextmenu"));
@@ -84041,24 +84072,14 @@ var _proj2 = require("ol/proj/proj4");
 
 var _proj3 = _interopRequireDefault(require("proj4"));
 
-var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
-
-var _Image = _interopRequireDefault(require("ol/layer/Image"));
-
-var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
-
 var _serverRequest = require("./server-request");
 
 var _highlight = _interopRequireDefault(require("./highlight"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
+// Third party
+// Registering projection
 // Projection Definition
 _proj3.default.defs('EPSG:2248', '+proj=lcc +lat_1=39.45 +lat_2=38.3 +lat_0=37.66666666666666 +lon_0=-77 +x_0=399999.9998983998 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs');
 
@@ -84075,7 +84096,6 @@ var view = new _View.default({
   zoom: 4.5,
   maxZoom: 13
 });
-var resolution = view.getResolution();
 var baseMap = new _Tile.default({
   source: new _OSM.default()
 });
@@ -84091,77 +84111,8 @@ var map = new _Map.default({
   layers: [baseMap, featureLayer, parcels],
   target: 'map',
   view: view
-}); // Menu TODO: Move to module
+}); // Menu
 
-var MenuControl = /*#__PURE__*/function () {
-  function MenuControl() {
-    _classCallCheck(this, MenuControl);
-
-    this.lastAction = null;
-    this.selected = new Set();
-  }
-
-  _createClass(MenuControl, [{
-    key: "addPoint",
-    // deleteSelection() {
-    //     selection.forEach((f) => {
-    //         featureLayer.removeFeature(f);
-    //     });
-    //     update();
-    //     refresh_sources();
-    // }
-    // listSelection() {
-    //     var content = '';
-    //     this.selection.forEach((f) => {
-    //         console.log(f);
-    //     });
-    //     const html = content;
-    // }
-    value: function addPoint(obj) {
-      _serverRequest.vectorSource.addFeature(obj.data.point);
-
-      (0, _serverRequest.transactWFS)('insert', obj.data.point);
-    }
-  }, {
-    key: "deletePoint",
-    value: function deletePoint(obj) {
-      _serverRequest.vectorSource.removeFeature(obj.data.point);
-
-      (0, _serverRequest.transactWFS)('delete', obj.data.point);
-    } // movePoint() {
-    // }
-    // editPoint() {
-    //     // modal window
-    // }
-    // undo(){
-    //     switch(this.lastAction) {
-    //         case 'create':
-    //             break;
-    //         case 'delete':
-    //             break;
-    //         case 'move':
-    //             break;
-    //         case 'edit':
-    //             break;
-    //     }
-    // }
-
-  }], [{
-    key: "Actions",
-    get: function get() {
-      Object.freeze({
-        CREATE: 'create',
-        DELETE: 'delete',
-        MOVE: 'move',
-        EDIT: 'edit'
-      });
-    }
-  }]);
-
-  return MenuControl;
-}();
-
-var menucontrol = new MenuControl();
 var contextmenu = new _olContextmenu2.default({
   width: 170,
   defaultItems: true,
@@ -84183,7 +84134,7 @@ contextmenu.on('open', function (evt) {
         data: {
           point: f
         },
-        callback: menucontrol.deletePoint
+        callback: _serverRequest.deletePoint
       });
     });
     contextmenu.extend(delete_items);
@@ -84196,7 +84147,7 @@ contextmenu.on('open', function (evt) {
       data: {
         point: new_point
       },
-      callback: menucontrol.addPoint
+      callback: _serverRequest.addPoint
     }];
     contextmenu.clear();
     contextmenu.extend(add_item);
@@ -84207,45 +84158,7 @@ contextmenu.on('open', function (evt) {
 var popup = new _olPopup2.default({
   element: document.getElementById('popup')
 });
-map.addOverlay(popup);
-
-function showPopup(coordinate) {
-  // get wms url
-  var viewResolution =
-  /** @type {number} */
-  resolution;
-
-  var url = _serverRequest.wmsSource.getFeatureInfoUrl(coordinate, viewResolution, 'EPSG:2248', {
-    'INFO_FORMAT': 'application/json'
-  }); // request wms service
-
-
-  if (url) {
-    fetch(url).then(function (response) {
-      return response.text();
-    }).then(function (json) {
-      var obj = JSON.parse(json);
-      var items = []; // show popup if there is a feature
-
-      if (obj.features.length > 0) {
-        // create table
-        var p = obj.features[0].properties;
-
-        for (var key in p) {
-          if (p.hasOwnProperty(key) && key != 'bbox') {
-            items.push("<tr>\n                  <th scope=\"row\">".concat(key, "</th>\n                  <td>").concat(p[key], "</td>\n                  <tr>"));
-          }
-        }
-
-        var html = "\n            <html>\n            <body>\n            <table>\n            " + items.join('') + "\n            </table>\n            </body>\n            </html>\n            ";
-        popup.show(coordinate, html);
-      } else {
-        // otherwise hide popup
-        popup.hide();
-      }
-    });
-  }
-} // function selectFeature(evt) {
+map.addOverlay(popup); // function selectFeature(evt) {
 //   //TODO show list of selected properties
 //   if (map.getFeaturesAtPixel(evt.pixel).length > 0) {
 //     //select feature(s)
@@ -84267,13 +84180,44 @@ function showPopup(coordinate) {
 //   }
 // }
 
+function showPopup(coordinate) {
+  var resolution =
+  /** @type {number} */
+  view.getResolution();
+  var promise = (0, _serverRequest.getPopupData)(coordinate, resolution);
+  promise.then(function (obj) {
+    // show popup if there is a feature
+    if (obj.features.length > 0) {
+      var html = createTable(obj);
+      popup.show(coordinate, html);
+    } else {
+      // otherwise hide popup
+      popup.hide();
+    }
+  });
+}
+
+function createTable(obj) {
+  // create table
+  var items = [];
+  var p = obj.features[0].properties;
+
+  for (var key in p) {
+    if (p.hasOwnProperty(key) && key != 'bbox') {
+      items.push("<tr>\n          <th scope=\"row\">".concat(key, "</th>\n          <td>").concat(p[key], "</td>\n          <tr>"));
+    }
+  }
+
+  var html = "\n    <html>\n    <body>\n    <table>\n    " + items.join('') + "\n    </table>\n    </body>\n    </html>\n    ";
+  return html;
+}
 
 function clickhandler(evt) {
   showPopup(evt.coordinate);
 }
 
 map.on('singleclick', clickhandler);
-},{"ol/ol.css":"node_modules/ol/ol.css","ol-popup/src/ol-popup.css":"node_modules/ol-popup/src/ol-popup.css","ol-contextmenu/dist/ol-contextmenu.css":"node_modules/ol-contextmenu/dist/ol-contextmenu.css","ol/Map":"node_modules/ol/Map.js","ol/View":"node_modules/ol/View.js","ol/source/OSM":"node_modules/ol/source/OSM.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Point":"node_modules/ol/geom/Point.js","ol-popup":"node_modules/ol-popup/dist/ol-popup.js","ol-contextmenu":"node_modules/ol-contextmenu/dist/ol-contextmenu.js","ol-geocoder":"node_modules/ol-geocoder/dist/ol-geocoder.js","ol/proj":"node_modules/ol/proj.js","ol/proj/Projection":"node_modules/ol/proj/Projection.js","ol/proj/proj4":"node_modules/ol/proj/proj4.js","proj4":"node_modules/proj4/lib/index.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Image":"node_modules/ol/layer/Image.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","./server-request":"server-request.js","./highlight":"highlight.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"ol/ol.css":"node_modules/ol/ol.css","ol-popup/src/ol-popup.css":"node_modules/ol-popup/src/ol-popup.css","ol-contextmenu/dist/ol-contextmenu.css":"node_modules/ol-contextmenu/dist/ol-contextmenu.css","ol/Map":"node_modules/ol/Map.js","ol/View":"node_modules/ol/View.js","ol/source/OSM":"node_modules/ol/source/OSM.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Point":"node_modules/ol/geom/Point.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Image":"node_modules/ol/layer/Image.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol-popup":"node_modules/ol-popup/dist/ol-popup.js","ol-contextmenu":"node_modules/ol-contextmenu/dist/ol-contextmenu.js","ol-geocoder":"node_modules/ol-geocoder/dist/ol-geocoder.js","ol/proj":"node_modules/ol/proj.js","ol/proj/Projection":"node_modules/ol/proj/Projection.js","ol/proj/proj4":"node_modules/ol/proj/proj4.js","proj4":"node_modules/proj4/lib/index.js","./server-request":"server-request.js","./highlight":"highlight.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -84301,7 +84245,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64223" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49615" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

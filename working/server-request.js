@@ -40,7 +40,7 @@ loader: function (extent) {
 strategy: bbox
 });
 
-export var transactWFS = function (mode, f) {
+var transactWFS = function (mode, f) {
     var node;
     switch (mode) {
         case 'insert':
@@ -67,3 +67,24 @@ export var transactWFS = function (mode, f) {
         }
     });
 };
+
+// Retrieve popup data
+export var getPopupData = function(coordinate, resolution){
+  // get wms url
+  var url = wmsSource.getFeatureInfoUrl(
+    coordinate, resolution, 'EPSG:2248',
+    { 'INFO_FORMAT': 'application/json' });
+  // request wms service
+  if (url) {
+    return $.ajax(url);
+  }
+}
+
+// Menu functions
+export const addPoint = function(obj) {
+  transactWFS('insert', obj.data.point);
+}
+
+export const deletePoint = function(obj) {
+  transactWFS('delete', obj.data.point);
+}
