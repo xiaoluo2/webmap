@@ -334,6 +334,7 @@ export function parseLiteralStyle(style) {
     var parsedSize = expressionToGlsl(vertContext, size, ValueTypes.NUMBER_ARRAY | ValueTypes.NUMBER);
     var parsedOffset = expressionToGlsl(vertContext, offset, ValueTypes.NUMBER_ARRAY);
     var parsedTexCoord = expressionToGlsl(vertContext, texCoord, ValueTypes.NUMBER_ARRAY);
+    var parsedRotation = expressionToGlsl(vertContext, rotation, ValueTypes.NUMBER);
     /**
      * @type {import("../style/expressions.js").ParsingContext}
      */
@@ -345,7 +346,6 @@ export function parseLiteralStyle(style) {
     };
     var parsedColor = expressionToGlsl(fragContext, color, ValueTypes.COLOR);
     var parsedOpacity = expressionToGlsl(fragContext, opacity, ValueTypes.NUMBER);
-    var parsedRotation = expressionToGlsl(fragContext, rotation, ValueTypes.NUMBER);
     var opacityFilter = '1.0';
     var visibleSize = "vec2(" + expressionToGlsl(fragContext, size, ValueTypes.NUMBER_ARRAY | ValueTypes.NUMBER) + ").x";
     switch (symbStyle.symbolType) {
