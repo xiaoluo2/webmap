@@ -322,8 +322,8 @@
 .ol-popup-closer {
     position: absolute;
     top: 2px;
-    right: 2px;
-    font-size: 150%;
+    right: 0;
+    font-size: 100%;
     padding: 0 4px;
     color: grey;
     text-decoration: none;
@@ -347,12 +347,14 @@
 }
 
 .ol-popup-content table {
-    border: 2px solid grey;
+    border: 1px solid black;
 }
 
 .ol-popup-content th {
+    border: 1px solid black;
     border-radius: 5px;
     background-color: skyblue;
+    font-size: small;
 }
 
 .ol-popup-content tr {
@@ -360,7 +362,7 @@
 }
 
 .ol-popup-content td {
-    border: 2px solid lightgray;
+    border: 1px solid black;
 }
 
 .ol-popup.marker {

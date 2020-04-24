@@ -1,0 +1,87 @@
+.ol-popup {
+    display: none;
+    position: absolute;
+    background-color: white;
+    padding: 15px 25px 15px 15px;
+    border: 1px solid black;
+    bottom: 12px;
+    left: -50px;
+}
+
+.ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.ol-popup:after {
+    border-top-color: black;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+
+.ol-popup-content {
+    overflow-x: auto;
+}
+
+.ol-popup-closer {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    font-size: 100%;
+    padding: 0 4px;
+    color: grey;
+    text-decoration: none;
+}
+
+.ol-popup-closer:after {
+    content: "\2716";
+}
+
+.ol-popup div.infoResult {
+    min-width: 130px;
+}
+
+.ol-popup div.infoResult p {
+    padding: 0.1em;
+    margin: 0;
+}
+
+.ol-popup-content h3 {
+    margin: 0.25em 0;
+}
+
+.ol-popup-content table {
+    border: 1px solid black;
+}
+
+.ol-popup-content th {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: skyblue;
+    font-size: small;
+}
+
+.ol-popup-content tr {
+    background-color: rgb(202, 227, 236);
+}
+
+.ol-popup-content td {
+    border: 1px solid black;
+}
+
+.ol-popup.marker {
+    margin-bottom: 30px;
+}
