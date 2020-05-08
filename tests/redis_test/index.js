@@ -8,14 +8,6 @@ var publisher = redis.createClient();
 
 var io = require('socket.io')(http)
 
-// const {Client} = require('pg');
-// const client = new Client();
-
-// await client.connect();
-// client.on('style_update', fucntion(){
-//     // TODO geoserver rest
-// });
-
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
@@ -39,8 +31,5 @@ io.on('connection', function(socket){
     socket.on('update', function(){
         publisher.publish('channel', 'update');
         io.emit('update');
-    });
-    socket.on('sytle_update', function(){
-        client.query
     });
 });
